@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/gregoryv/qual.svg?branch=master)](https://travis-ci.org/gregoryv/qual)
-[![codecov](https://codecov.io/gh/gregoryv/qual/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/qual)
+[![Build Status](https://travis-ci.org/gregoryv/asserter.svg?branch=master)](https://travis-ci.org/gregoryv/asserter)
+[![codecov](https://codecov.io/gh/gregoryv/asserter/branch/master/graph/badge.svg)](https://codecov.io/gh/gregoryv/asserter)
 [asserter](https://godoc.org/github.com/gregoryv/asserter) - Go package oneline assertions
 
 ## Quick start
