@@ -32,27 +32,51 @@ type A interface {
 
 type AssertFunc func(expr ...bool) A
 
-type ta struct {
-	t T
+type wrappedT struct {
+	T
 }
 
-func (t *ta) Helper() {
+func (w *wrappedT) Helper() {
 	/* Cannot use the asserter as helper */
 }
-func (t *ta) Error(args ...interface{})                 { t.t.Helper(); t.t.Error(args...) }
-func (t *ta) Errorf(format string, args ...interface{}) { t.t.Helper(); t.t.Errorf(format, args...) }
-func (t *ta) Fatal(args ...interface{})                 { t.t.Helper(); t.t.Fatal(args...) }
-func (t *ta) Fatalf(format string, args ...interface{}) { t.t.Helper(); t.t.Fatalf(format, args...) }
-func (t *ta) Fail()                                     { t.t.Helper(); t.t.Fail() }
-func (t *ta) FailNow()                                  { t.t.Helper(); t.t.FailNow() }
-func (t *ta) Equals(got, exp interface{}, msg ...string) {
-	t.t.Helper()
+func (w *wrappedT) Error(args ...interface{}) {
+	w.T.Helper()
+	w.T.Error(args...)
+}
+
+func (w *wrappedT) Errorf(format string, args ...interface{}) {
+	w.T.Helper()
+	w.T.Errorf(format, args...)
+}
+
+func (w *wrappedT) Fatal(args ...interface{}) {
+	w.T.Helper()
+	w.T.Fatal(args...)
+}
+
+func (w *wrappedT) Fatalf(format string, args ...interface{}) {
+	w.T.Helper()
+	w.T.Fatalf(format, args...)
+}
+
+func (w *wrappedT) Fail() {
+	w.T.Helper()
+	w.T.Fail()
+}
+
+func (w *wrappedT) FailNow() {
+	w.T.Helper()
+	w.T.FailNow()
+}
+
+func (w *wrappedT) Equals(got, exp interface{}, msg ...string) {
+	w.T.Helper()
 	if got != exp {
 		str := ""
 		if len(msg) > 0 {
 			str = " " + strings.Join(msg, " ")
 		}
-		t.Errorf("got %v, expected %v%s", got, exp, str)
+		w.Errorf("got %v, expected %v%s", got, exp, str)
 	}
 }
 
@@ -77,7 +101,7 @@ func New(t T) AssertFunc {
 			t.Fatal("Only 0 or 1 bool expressions are allowed")
 		}
 		if len(expr) == 0 || !expr[0] {
-			return &ta{t}
+			return &wrappedT{t}
 		}
 		return ok
 	}

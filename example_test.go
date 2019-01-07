@@ -21,7 +21,7 @@ func Test_something(t *testing.T) {
 	got, err := something()
 	assert(err == nil).Fatal(err)
 	exp := 1
-	assert().Equals(got, 1)
+	assert().Equals(got, exp)
 	// Same as
 	assert(got == exp).Errorf("got %v, expected %v", got, exp)
 }
