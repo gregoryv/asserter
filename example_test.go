@@ -11,16 +11,19 @@ var t = &testing.T{}
 func ExampleNew() {
 	assert := asserter.New(t)
 	assert(1 != 2).Errorf("...")
-	assert(false).Log("...")
-	assert(true).Fail()
+	got, exp := 1, 1
+	assert(got == exp).Fail()
+	assert().Equals(got, exp)
 }
 
 func Test_something(t *testing.T) {
 	assert := asserter.New(t)
 	got, err := something()
-	exp := 1
 	assert(err == nil).Fatal(err)
-	assert(got == exp).Errorf("%v, expected %v", got, exp)
+	exp := 1
+	assert().Equals(got, 1)
+	// Same as
+	assert(got == exp).Errorf("got %v, expected %v", got, exp)
 }
 
 func something() (int, error) {

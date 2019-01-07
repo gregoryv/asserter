@@ -18,16 +18,36 @@ type T interface {
 	Errorf(string, ...interface{})
 	Fatal(...interface{})
 	Fatalf(string, ...interface{})
-	Log(...interface{})
-	Logf(string, ...interface{})
 	Fail()
 	FailNow()
-	Skip(...interface{})
-	SkipNow()
-	Skipf(string, ...interface{})
 }
 
-type AssertFunc func(bool) T
+type A interface {
+	T
+	Equals(got, exp interface{})
+}
+
+type AssertFunc func(expr ...bool) A
+
+type ta struct {
+	t T
+}
+
+func (t *ta) Helper() {
+	/* Cannot use the asserter as helper */
+}
+func (t *ta) Error(args ...interface{})                 { t.t.Helper(); t.t.Error(args...) }
+func (t *ta) Errorf(format string, args ...interface{}) { t.t.Helper(); t.t.Errorf(format, args...) }
+func (t *ta) Fatal(args ...interface{})                 { t.t.Helper(); t.t.Fatal(args...) }
+func (t *ta) Fatalf(format string, args ...interface{}) { t.t.Helper(); t.t.Fatalf(format, args...) }
+func (t *ta) Fail()                                     { t.t.Helper(); t.t.Fail() }
+func (t *ta) FailNow()                                  { t.t.Helper(); t.t.FailNow() }
+func (t *ta) Equals(got, exp interface{}) {
+	t.t.Helper()
+	if got != exp {
+		t.Errorf("got %v, expected %v", got, exp)
+	}
+}
 
 type noopT struct{}
 
@@ -36,21 +56,21 @@ func (t *noopT) Error(...interface{})          {}
 func (t *noopT) Errorf(string, ...interface{}) {}
 func (t *noopT) Fatal(...interface{})          {}
 func (t *noopT) Fatalf(string, ...interface{}) {}
-func (t *noopT) Log(...interface{})            {}
-func (t *noopT) Logf(string, ...interface{})   {}
 func (t *noopT) Fail()                         {}
 func (t *noopT) FailNow()                      {}
-func (t *noopT) Skip(...interface{})           {}
-func (t *noopT) SkipNow()                      {}
-func (t *noopT) Skipf(string, ...interface{})  {}
+func (t *noopT) Equals(got, exp interface{})   {}
 
 var ok *noopT = &noopT{}
 
 // Assert returns an asserter for online assertions.
 func New(t T) AssertFunc {
-	return func(expr bool) T {
-		if !expr {
-			return t
+	return func(expr ...bool) A {
+		if len(expr) > 1 {
+			t.Helper()
+			t.Fatal("Only 0 or 1 bool expressions are allowed")
+		}
+		if len(expr) == 0 || !expr[0] {
+			return &ta{t}
 		}
 		return ok
 	}
