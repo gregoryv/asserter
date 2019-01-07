@@ -18,6 +18,7 @@ func TestNew(t *testing.T) {
 	assert(false).Fail()
 	assert(false).FailNow()
 	assert(false).Equals(true, false)
+	assert(false).Equals(true, false, "case 1")
 	assert(true, false) // More than one is disallowed
 }
 

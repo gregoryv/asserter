@@ -7,10 +7,13 @@ Online assertions are done by wrapping the T in a test
         got, err := Something()
         t.Logf("%v, %v := Something()", got, err)
         assert(err == nil).Fail()
-        assert(got == exp).Fail()
+        // Special case used very often is check equality
+        assert().Equals(got, 1)
     }
 */
 package asserter
+
+import "strings"
 
 type T interface {
 	Helper()
@@ -24,7 +27,7 @@ type T interface {
 
 type A interface {
 	T
-	Equals(got, exp interface{})
+	Equals(got, exp interface{}, msg ...string)
 }
 
 type AssertFunc func(expr ...bool) A
@@ -42,23 +45,27 @@ func (t *ta) Fatal(args ...interface{})                 { t.t.Helper(); t.t.Fata
 func (t *ta) Fatalf(format string, args ...interface{}) { t.t.Helper(); t.t.Fatalf(format, args...) }
 func (t *ta) Fail()                                     { t.t.Helper(); t.t.Fail() }
 func (t *ta) FailNow()                                  { t.t.Helper(); t.t.FailNow() }
-func (t *ta) Equals(got, exp interface{}) {
+func (t *ta) Equals(got, exp interface{}, msg ...string) {
 	t.t.Helper()
 	if got != exp {
-		t.Errorf("got %v, expected %v", got, exp)
+		str := ""
+		if len(msg) > 0 {
+			str = " " + strings.Join(msg, " ")
+		}
+		t.Errorf("got %v, expected %v%s", got, exp, str)
 	}
 }
 
 type noopT struct{}
 
-func (t *noopT) Helper()                       {}
-func (t *noopT) Error(...interface{})          {}
-func (t *noopT) Errorf(string, ...interface{}) {}
-func (t *noopT) Fatal(...interface{})          {}
-func (t *noopT) Fatalf(string, ...interface{}) {}
-func (t *noopT) Fail()                         {}
-func (t *noopT) FailNow()                      {}
-func (t *noopT) Equals(got, exp interface{})   {}
+func (t *noopT) Helper()                                    {}
+func (t *noopT) Error(...interface{})                       {}
+func (t *noopT) Errorf(string, ...interface{})              {}
+func (t *noopT) Fatal(...interface{})                       {}
+func (t *noopT) Fatalf(string, ...interface{})              {}
+func (t *noopT) Fail()                                      {}
+func (t *noopT) FailNow()                                   {}
+func (t *noopT) Equals(got, exp interface{}, msg ...string) {}
 
 var ok *noopT = &noopT{}
 

@@ -13,4 +13,8 @@ In your tests
        got, err := something()
        assert(err == nil).Fatal(err)
        assert(got == exp).Errorf("%v, expected %v", got, exp)
+	   // or the shorter version when checking got vs. expected
+	   assert().Equals(got, exp)
+	   // and with optional case message
+	   assert().Equals(got, exp, "with no arguments")
     }
