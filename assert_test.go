@@ -11,8 +11,12 @@ func TestNew(t *testing.T) {
 	assert(true).Equals(1, 1)
 	assert(true).Contains(1, 1)
 
+	// cover the case when Contains fails and contains new lines
+	New(&noopT{})().Contains("hello\nworld", "q")
+
 	assert().Contains([]byte("hello"), "h")
 	assert().Contains("hello", "h")
+	assert().Contains("hello\nworld", "wo")
 	assert().Contains("100", 1)
 	assert().Contains("100", []byte("1"))
 

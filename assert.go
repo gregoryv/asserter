@@ -100,7 +100,11 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	e := toBytes(w.T, exp, "exp")
 
 	if bytes.Index(b, e) == -1 {
-		w.Errorf("%q does not contain %q", string(b), string(e))
+		format := "%q does not contain %q"
+		if bytes.Index(b, []byte("\n")) > -1 {
+			format = "%s\ndoes not contain\n%s"
+		}
+		w.Errorf(format, string(b), string(e))
 	}
 	return w.T
 }
