@@ -83,6 +83,9 @@ func (w *wrappedT) Logf(format string, args ...interface{}) {
 	w.T.Helper()
 	w.T.Logf(format, args...)
 }
+
+// Helpers
+
 func (w *wrappedT) Equals(got, exp interface{}) T {
 	w.T.Helper()
 	if got != exp {
@@ -96,8 +99,8 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	b := toBytes(w.T, body, "body")
 	e := toBytes(w.T, exp, "exp")
 
-	if bytes.Contains(b, e) {
-		w.Errorf("%q does not contain %q", body, exp)
+	if bytes.Index(b, e) == -1 {
+		w.Errorf("%q does not contain %q", string(b), string(e))
 	}
 	return w.T
 }
