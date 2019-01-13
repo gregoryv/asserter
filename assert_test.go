@@ -11,6 +11,11 @@ func TestNew(t *testing.T) {
 	assert(true).Equals(1, 1)
 	assert(true).Contains(1, 1)
 
+	assert().Contains([]byte("hello"), "h")
+	assert().Contains("hello", "h")
+	assert().Contains("100", 1)
+	assert().Contains("100", []byte("1"))
+
 	assert = New(&noopT{})
 	assert(false).Helper()
 	assert(false).Error()

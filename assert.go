@@ -108,6 +108,7 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 func toBytes(t T, v interface{}, name string) (b []byte) {
 	switch v := v.(type) {
 	case []byte:
+		return v
 	case string:
 		return []byte(v)
 	case int:
