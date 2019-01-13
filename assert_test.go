@@ -8,6 +8,8 @@ import (
 func TestNew(t *testing.T) {
 	assert := New(t)
 	assert(true).Fail()
+	assert(true).Equals(1, 1)
+	assert(true).Contains(1, 1)
 
 	assert = New(&noopT{})
 	assert(false).Helper()
@@ -17,12 +19,14 @@ func TestNew(t *testing.T) {
 	assert(false).Fatalf("%s", "yes")
 	assert(false).Fail()
 	assert(false).FailNow()
+	assert(false).Log()
+	assert(false).Logf("%s", "yes")
 	assert(false).Equals(true, false)
-	assert(false).Equals(true, false, "case 1")
+	assert(false).Equals(true, false).Log("case 1")
 	assert(false).Contains("hello", "h")
 	assert(false).Contains([]byte("hello"), "h")
 	assert(false).Contains([]byte("hello"), 1)
-	assert(false).Contains([]byte("hello"), 1.0)
+	assert(false).Contains([]byte("hello"), 1.0).Log("a float")
 	assert(true, false) // More than one is disallowed
 }
 

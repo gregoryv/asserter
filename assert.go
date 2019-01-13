@@ -16,7 +16,6 @@ package asserter
 import (
 	"bytes"
 	"strconv"
-	"strings"
 )
 
 type T interface {
@@ -27,12 +26,14 @@ type T interface {
 	Fatalf(string, ...interface{})
 	Fail()
 	FailNow()
+	Log(...interface{})
+	Logf(string, ...interface{})
 }
 
 type A interface {
 	T
-	Equals(got, exp interface{}, msg ...string)
-	Contains(body, exp interface{})
+	Equals(got, exp interface{}) T
+	Contains(body, exp interface{}) T
 }
 
 type AssertFunc func(expr ...bool) A
@@ -73,19 +74,24 @@ func (w *wrappedT) FailNow() {
 	w.T.Helper()
 	w.T.FailNow()
 }
-
-func (w *wrappedT) Equals(got, exp interface{}, msg ...string) {
+func (w *wrappedT) Log(args ...interface{}) {
 	w.T.Helper()
-	if got != exp {
-		str := ""
-		if len(msg) > 0 {
-			str = " " + strings.Join(msg, " ")
-		}
-		w.Errorf("got %v, expected %v%s", got, exp, str)
-	}
+	w.T.Log(args...)
 }
 
-func (w *wrappedT) Contains(body, exp interface{}) {
+func (w *wrappedT) Logf(format string, args ...interface{}) {
+	w.T.Helper()
+	w.T.Logf(format, args...)
+}
+func (w *wrappedT) Equals(got, exp interface{}) T {
+	w.T.Helper()
+	if got != exp {
+		w.Errorf("got %v, expected %v", got, exp)
+	}
+	return w.T
+}
+
+func (w *wrappedT) Contains(body, exp interface{}) T {
 	w.T.Helper()
 	b := toBytes(w.T, body, "body")
 	e := toBytes(w.T, exp, "exp")
@@ -93,6 +99,7 @@ func (w *wrappedT) Contains(body, exp interface{}) {
 	if bytes.Contains(b, e) {
 		w.Errorf("%q does not contain %q", body, exp)
 	}
+	return w.T
 }
 
 func toBytes(t T, v interface{}, name string) (b []byte) {
@@ -110,15 +117,17 @@ func toBytes(t T, v interface{}, name string) (b []byte) {
 
 type noopT struct{}
 
-func (t *noopT) Helper()                                    {}
-func (t *noopT) Error(...interface{})                       {}
-func (t *noopT) Errorf(string, ...interface{})              {}
-func (t *noopT) Fatal(...interface{})                       {}
-func (t *noopT) Fatalf(string, ...interface{})              {}
-func (t *noopT) Fail()                                      {}
-func (t *noopT) FailNow()                                   {}
-func (t *noopT) Equals(got, exp interface{}, msg ...string) {}
-func (w *noopT) Contains(body, exp interface{})             {}
+func (t *noopT) Helper()                          {}
+func (t *noopT) Error(...interface{})             {}
+func (t *noopT) Errorf(string, ...interface{})    {}
+func (t *noopT) Fatal(...interface{})             {}
+func (t *noopT) Fatalf(string, ...interface{})    {}
+func (t *noopT) Fail()                            {}
+func (t *noopT) FailNow()                         {}
+func (t *noopT) Log(...interface{})               {}
+func (t *noopT) Logf(string, ...interface{})      {}
+func (t *noopT) Equals(got, exp interface{}) T    { return t }
+func (t *noopT) Contains(body, exp interface{}) T { return t }
 
 var ok *noopT = &noopT{}
 
