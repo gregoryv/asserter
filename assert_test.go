@@ -19,6 +19,10 @@ func TestNew(t *testing.T) {
 	assert(false).FailNow()
 	assert(false).Equals(true, false)
 	assert(false).Equals(true, false, "case 1")
+	assert(false).Contains("hello", "h")
+	assert(false).Contains([]byte("hello"), "h")
+	assert(false).Contains([]byte("hello"), 1)
+	assert(false).Contains([]byte("hello"), 1.0)
 	assert(true, false) // More than one is disallowed
 }
 

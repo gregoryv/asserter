@@ -13,7 +13,11 @@ Online assertions are done by wrapping the T in a test
 */
 package asserter
 
-import "strings"
+import (
+	"bytes"
+	"strconv"
+	"strings"
+)
 
 type T interface {
 	Helper()
@@ -28,6 +32,7 @@ type T interface {
 type A interface {
 	T
 	Equals(got, exp interface{}, msg ...string)
+	Contains(body, exp interface{})
 }
 
 type AssertFunc func(expr ...bool) A
@@ -80,6 +85,29 @@ func (w *wrappedT) Equals(got, exp interface{}, msg ...string) {
 	}
 }
 
+func (w *wrappedT) Contains(body, exp interface{}) {
+	w.T.Helper()
+	b := toBytes(w.T, body, "body")
+	e := toBytes(w.T, exp, "exp")
+
+	if bytes.Contains(b, e) {
+		w.Errorf("%q does not contain %q", body, exp)
+	}
+}
+
+func toBytes(t T, v interface{}, name string) (b []byte) {
+	switch v := v.(type) {
+	case []byte:
+	case string:
+		return []byte(v)
+	case int:
+		return []byte(strconv.Itoa(v))
+	default:
+		t.Fatalf("%s must be []byte, string or int", name)
+	}
+	return
+}
+
 type noopT struct{}
 
 func (t *noopT) Helper()                                    {}
@@ -90,6 +118,7 @@ func (t *noopT) Fatalf(string, ...interface{})              {}
 func (t *noopT) Fail()                                      {}
 func (t *noopT) FailNow()                                   {}
 func (t *noopT) Equals(got, exp interface{}, msg ...string) {}
+func (w *noopT) Contains(body, exp interface{})             {}
 
 var ok *noopT = &noopT{}
 
