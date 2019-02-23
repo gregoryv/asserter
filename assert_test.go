@@ -1,6 +1,7 @@
 package asserter
 
 import (
+	"bytes"
 	"fmt"
 	"testing"
 )
@@ -36,8 +37,20 @@ func TestNew(t *testing.T) {
 	assert(false).Contains([]byte("hello"), "h")
 	assert(false).Contains([]byte("hello"), 1)
 	assert(false).Contains([]byte("hello"), 1.0).Log("a float")
+
+	reader := bytes.NewBufferString("hello")
+	assert(false).Contains(reader, "hello")
+
+	broken := brokenReader("break")
+	assert(false).Contains(broken, "break")
 	assert(true, false) // More than one is disallowed
 }
 
 var t *noopT = &noopT{} // mock for *testing.T
 var err error = fmt.Errorf("")
+
+type brokenReader string
+
+func (br brokenReader) Read(buf []byte) (int, error) {
+	return 0, fmt.Errorf(string(br))
+}

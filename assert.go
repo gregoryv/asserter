@@ -15,6 +15,8 @@ package asserter
 
 import (
 	"bytes"
+	"io"
+	"io/ioutil"
 	"strconv"
 )
 
@@ -117,10 +119,19 @@ func toBytes(t T, v interface{}, name string) (b []byte) {
 		return []byte(v)
 	case int:
 		return []byte(strconv.Itoa(v))
-	default:
-		t.Fatalf("%s must be []byte, string or int", name)
+	case io.Reader:
+		return bytesOrError(v)
 	}
+	t.Fatalf("%s must be io.Reader, []byte, string or int", name)
 	return
+}
+
+func bytesOrError(r io.Reader) []byte {
+	body, err := ioutil.ReadAll(r)
+	if err != nil {
+		return []byte(err.Error())
+	}
+	return body
 }
 
 type noopT struct{}
