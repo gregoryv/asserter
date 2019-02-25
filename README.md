@@ -18,4 +18,13 @@ In your tests
 	   assert().Equals(got, exp)
 	   // and with optional case message
 	   assert().Equals(got, exp, "with no arguments")
+	   
+       assert().Contains(got, "text")
+	   assert().Contains(got, 1)
+
+	
+	   // Readers can also be tested
+	   resp, err := http.Get("http://example.com")
+	   assert(err == nil).Fatal(err)
+	   assert().Contains(resp, "<title>")
     }
