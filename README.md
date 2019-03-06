@@ -23,7 +23,7 @@ In your tests
 	   assert().Contains(got, 1)
 
 	
-	   // Readers can also be tested
+	   // Check readers content 
 	   resp, err := http.Get("http://example.com")
 	   assert(err == nil).Fatal(err)
 	   assert().Contains(resp, "<title>")
