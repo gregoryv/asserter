@@ -26,5 +26,5 @@ In your tests
 	   // Check readers content 
 	   resp, err := http.Get("http://example.com")
 	   assert(err == nil).Fatal(err)
-	   assert().Contains(resp, "<title>")
+	   assert().Contains(resp.Body, "<title>")
     }

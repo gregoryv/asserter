@@ -1,6 +1,7 @@
 package asserter_test
 
 import (
+	"net/http"
 	"testing"
 
 	"github.com/gregoryv/asserter"
@@ -24,6 +25,9 @@ func Test_something(t *testing.T) {
 	assert().Equals(got, exp)
 	// Same as
 	assert(got == exp).Errorf("got %v, expected %v", got, exp)
+
+	resp, err := http.Get("http://example.com")
+	assert().Contains(resp.Body, "</html>")
 }
 
 func something() (int, error) {
