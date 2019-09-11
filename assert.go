@@ -96,6 +96,8 @@ func (w *wrappedT) Equals(got, exp interface{}) T {
 	return w.T
 }
 
+// Contains checks the body for the given expression.
+// The body can be various types.
 func (w *wrappedT) Contains(body, exp interface{}) T {
 	w.T.Helper()
 	b := toBytes(w.T, body, "body")
