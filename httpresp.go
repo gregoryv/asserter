@@ -16,7 +16,7 @@ type HttpResponse struct {
 // message.
 func (t *HttpResponse) StatusCode(exp int, m, p string, opt ...interface{}) {
 	t.Helper()
-	body, headers, message := t.parse(opt)
+	body, headers, message := t.parse(opt...)
 	w := httptest.NewRecorder()
 	r, err := http.NewRequest(m, p, body)
 	if err != nil {
@@ -26,7 +26,9 @@ func (t *HttpResponse) StatusCode(exp int, m, p string, opt ...interface{}) {
 	r.Header = headers
 	t.ServeHTTP(w, r)
 	resp := w.Result()
-
+	if message == "" {
+		message = "StatusCode"
+	}
 	if resp.StatusCode != exp {
 		t.Fatalf(
 			"%s: %s, expected %v %s",
@@ -40,12 +42,12 @@ func (t *HttpResponse) parse(options ...interface{}) (
 ) {
 	for _, opt := range options {
 		switch v := opt.(type) {
-		case string:
-			message = v
 		case io.Reader:
 			body = v
 		case http.Header:
 			headers = v
+		case string:
+			message = v
 		}
 	}
 	return
