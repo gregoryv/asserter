@@ -117,7 +117,7 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 }
 
 func (w *wrappedT) ResponseFrom(h http.Handler) *HttpResponse {
-	return &HttpResponse{w, h}
+	return &HttpResponse{w.T, h}
 }
 
 func toBytes(t T, v interface{}, name string) (b []byte) {
