@@ -9,12 +9,15 @@ import (
 func TestHttpResponse(t *testing.T) {
 	var code int
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
 	})
 	assert := New(t)
 	exp := assert().ResponseFrom(handler)
 	code = 200
 	exp.StatusCode(200, "GET", "/")
+	exp.Header("Content-Type", "application/json", "GET", "/")
+	exp.Header("Content-Type", "application/json", "GET", "/", "checking")
 	code = 400
 	exp.StatusCode(400, "GET", "/")
 
@@ -22,6 +25,7 @@ func TestHttpResponse(t *testing.T) {
 	exp = assert().ResponseFrom(handler)
 	exp.StatusCode(-1, "::;", "")
 	exp.StatusCode(500, "GET", "/", "noopT should fail") // covers only
+	exp.Header("Content-Type", "text/html", "GET", "/")  // covers only
 }
 
 func TestHttpResponse_uses_header(t *testing.T) {
