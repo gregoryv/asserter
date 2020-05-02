@@ -2,12 +2,16 @@ package asserter_test
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/gregoryv/asserter"
 )
 
-var t = &testing.T{}
+var (
+	t       = &testing.T{}
+	handler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {})
+)
 
 func ExampleNew() {
 	assert := asserter.New(t)
@@ -15,6 +19,14 @@ func ExampleNew() {
 	got, exp := 1, 1
 	assert(got == exp).Fail()
 	assert().Equals(got, exp)
+}
+
+func ExampleHttpResponse_StatusCode() {
+	assert := asserter.New(t)
+	exp := assert().ResponseFrom(handler)
+	exp.StatusCode(200, "POST", "/", strings.NewReader("the body"))
+	exp.StatusCode(200, "GET", "/", "should be ok")
+	exp.StatusCode(200, "GET", "/")
 }
 
 func Test_something(t *testing.T) {

@@ -17,6 +17,7 @@ import (
 	"bytes"
 	"io"
 	"io/ioutil"
+	"net/http"
 	"strconv"
 )
 
@@ -36,6 +37,7 @@ type A interface {
 	T
 	Equals(got, exp interface{}) T
 	Contains(body, exp interface{}) T
+	ResponseFrom(http.Handler) *HttpResponse
 }
 
 type AssertFunc func(expr ...bool) A
@@ -47,6 +49,7 @@ type wrappedT struct {
 func (w *wrappedT) Helper() {
 	/* Cannot use the asserter as helper */
 }
+
 func (w *wrappedT) Error(args ...interface{}) {
 	w.T.Helper()
 	w.T.Error(args...)
@@ -113,6 +116,10 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	return w.T
 }
 
+func (w *wrappedT) ResponseFrom(h http.Handler) *HttpResponse {
+	return &HttpResponse{w, h}
+}
+
 func toBytes(t T, v interface{}, name string) (b []byte) {
 	switch v := v.(type) {
 	case []byte:
@@ -149,6 +156,9 @@ func (t *noopT) Log(...interface{})               {}
 func (t *noopT) Logf(string, ...interface{})      {}
 func (t *noopT) Equals(got, exp interface{}) T    { return t }
 func (t *noopT) Contains(body, exp interface{}) T { return t }
+func (t *noopT) ResponseFrom(h http.Handler) *HttpResponse {
+	return &HttpResponse{t, h}
+}
 
 var ok *noopT = &noopT{}
 
