@@ -1,8 +1,10 @@
 package asserter
 
 import (
+	"bytes"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 )
@@ -33,6 +35,52 @@ func (t *HttpResponse) StatusCode(exp int, m, p string, opt ...interface{}) {
 	}
 }
 
+// BodyIs the same as BodyEquals
+func (t *HttpResponse) BodyIs(exp string, m, p string, opt ...interface{}) {
+	t.Helper()
+	t.BodyEquals([]byte(exp), m, p, opt...)
+}
+
+func (t *HttpResponse) BodyEquals(exp []byte, m, p string, opt ...interface{}) {
+	t.Helper()
+	body, headers, message := t.parse(opt...)
+	resp := t.do(m, p, body, headers)
+	if resp == nil {
+		return
+	}
+	if message == "" {
+		message = "Body"
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(message, err)
+	}
+	if !bytes.Equal(data, exp) {
+		t.Error(message, "\ngot:", string(data), "\nexp:", string(exp))
+	}
+}
+
+// Contains fails if body does not contain exp
+func (t *HttpResponse) Contains(exp string, m, p string, opt ...interface{}) {
+	t.Helper()
+	body, headers, message := t.parse(opt...)
+	resp := t.do(m, p, body, headers)
+	if resp == nil {
+		return
+	}
+	if message == "" {
+		message = "Contains"
+	}
+	data, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Fatal(message, err)
+	}
+	if !bytes.Contains(data, []byte(exp)) {
+		t.Error(message, "\ngot:", string(data), "\nexp:", string(exp))
+	}
+}
+
+// Header checks if the k header matches exp value
 func (t *HttpResponse) Header(k, exp string, m, p string, opt ...interface{}) {
 	t.Helper()
 	body, headers, message := t.parse(opt...)

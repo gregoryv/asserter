@@ -11,6 +11,7 @@ func TestHttpResponse(t *testing.T) {
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
+		w.Write([]byte("test"))
 	})
 	assert := New(t)
 	exp := assert().ResponseFrom(handler)
@@ -18,6 +19,9 @@ func TestHttpResponse(t *testing.T) {
 	exp.StatusCode(200, "GET", "/")
 	exp.Header("Content-Type", "application/json", "GET", "/")
 	exp.Header("Content-Type", "application/json", "GET", "/", "checking")
+	exp.BodyIs("test", "GET", "/")
+	exp.Contains("te", "GET", "/")
+
 	code = 400
 	exp.StatusCode(400, "GET", "/")
 
