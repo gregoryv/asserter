@@ -117,6 +117,12 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	}
 	return w.T
 }
+
+func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
+	w.T.Helper()
+	return assertOk(w.T), assertBad(w.T)
+}
+
 func assertOk(t T) AssertErrFunc {
 	t.Helper()
 	return func(err error, msg ...string) {
@@ -143,10 +149,6 @@ func assertBad(t T) AssertErrFunc {
 			t.Error("should fail")
 		}
 	}
-}
-
-func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
-	return assertOk(w), assertBad(w)
 }
 
 type AssertErrFunc func(error, ...string)

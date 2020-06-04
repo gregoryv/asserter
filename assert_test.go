@@ -3,9 +3,15 @@ package asserter
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"testing"
 )
+
+func xTest_real(t *testing.T) {
+	assert := New(t)
+	ok, bad := assert().Errors()
+	ok(errors.New(""))
+	bad(nil)
+}
 
 func TestNew(t *testing.T) {
 	assert := New(t)
@@ -59,5 +65,5 @@ func TestNew(t *testing.T) {
 type brokenReader string
 
 func (br brokenReader) Read(buf []byte) (int, error) {
-	return 0, fmt.Errorf(string(br))
+	return 0, errors.New(string(br))
 }
