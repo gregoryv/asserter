@@ -118,6 +118,7 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	return w.T
 }
 func assertOk(t T) AssertErrFunc {
+	t.Helper()
 	return func(err error, msg ...string) {
 		t.Helper()
 		if err != nil {
@@ -131,6 +132,7 @@ func assertOk(t T) AssertErrFunc {
 }
 
 func assertBad(t T) AssertErrFunc {
+	t.Helper()
 	return func(err error, msg ...string) {
 		t.Helper()
 		if err == nil {
