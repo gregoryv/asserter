@@ -19,6 +19,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type T interface {
@@ -38,6 +39,7 @@ type A interface {
 	Equals(got, exp interface{}) T
 	Contains(body, exp interface{}) T
 	ResponseFrom(http.Handler) *HttpResponse
+	Errors() (ok, bad AssertErrFunc)
 }
 
 type AssertFunc func(expr ...bool) A
@@ -115,6 +117,37 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	}
 	return w.T
 }
+func assertOk(t T) AssertErrFunc {
+	return func(err error, msg ...string) {
+		t.Helper()
+		if err != nil {
+			if len(msg) > 0 {
+				t.Error(strings.Join(msg, " ")+":", err)
+				return
+			}
+			t.Error(err)
+		}
+	}
+}
+
+func assertBad(t T) AssertErrFunc {
+	return func(err error, msg ...string) {
+		t.Helper()
+		if err == nil {
+			if len(msg) > 0 {
+				t.Error(strings.Join(msg, " "), "should fail")
+				return
+			}
+			t.Error("should fail")
+		}
+	}
+}
+
+func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
+	return assertOk(w), assertBad(w)
+}
+
+type AssertErrFunc func(error, ...string)
 
 func (w *wrappedT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{w.T, h}
@@ -159,8 +192,9 @@ func (t *noopT) Contains(body, exp interface{}) T { return t }
 func (t *noopT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{t, h}
 }
-
-var ok *noopT = &noopT{}
+func (t *noopT) Errors() (ok, bad AssertErrFunc) {
+	return func(error, ...string) {}, func(error, ...string) {}
+}
 
 // Assert returns an asserter for online assertions.
 func New(t T) AssertFunc {
@@ -172,6 +206,6 @@ func New(t T) AssertFunc {
 		if len(expr) == 0 || !expr[0] {
 			return &wrappedT{t}
 		}
-		return ok
+		return &noopT{}
 	}
 }

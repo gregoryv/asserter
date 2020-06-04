@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Added AssertErrFunc for error only assertions
 - Added BodyIs,  BodyEquals and Contains for body asserts
 - Added HttpResponse.Header for checking single value headers
 

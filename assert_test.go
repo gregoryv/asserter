@@ -2,6 +2,7 @@ package asserter
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"testing"
 )
@@ -44,10 +45,16 @@ func TestNew(t *testing.T) {
 	broken := brokenReader("break")
 	assert(false).Contains(broken, "break")
 	assert(true, false) // More than one is disallowed
-}
 
-var t *noopT = &noopT{} // mock for *testing.T
-var err error = fmt.Errorf("")
+	ok, bad := assert().Errors()
+	ok(nil)
+	ok(nil, "message")
+	ok(errors.New(""))
+	ok(errors.New(""), "message")
+	ok(nil, "message")
+	bad(nil)
+	bad(nil, "message")
+}
 
 type brokenReader string
 
