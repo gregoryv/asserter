@@ -5,10 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [unreleased]
+### Added
 
-- Added AssertErrFunc for error only assertions
-- Added BodyIs,  BodyEquals and Contains for body asserts
-- Added HttpResponse.Header for checking single value headers
+- MixedErrFunc via assert().Mixed() for mixed return checks
+- AssertErrFunc for error only assertions
+- BodyIs,  BodyEquals and Contains for body asserts
+- HttpResponse.Header for checking single value headers
 
 ## [0.2.2] - 2020-05-02
 ## [0.2.1] - 2020-05-02

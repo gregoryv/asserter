@@ -40,6 +40,7 @@ type A interface {
 	Contains(body, exp interface{}) T
 	ResponseFrom(http.Handler) *HttpResponse
 	Errors() (ok, bad AssertErrFunc)
+	Mixed() (ok, bad MixedErrFunc)
 }
 
 type AssertFunc func(expr ...bool) A
@@ -118,6 +119,8 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 	return w.T
 }
 
+// ----------------------------------------
+
 func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
 	return assertOk(w.T), assertBad(w.T)
@@ -152,6 +155,39 @@ func assertBad(t T) AssertErrFunc {
 }
 
 type AssertErrFunc func(error, ...string)
+
+// ----------------------------------------
+
+func (w *wrappedT) Mixed() (ok, bad MixedErrFunc) {
+	w.T.Helper()
+	return mixOk(w.T), mixBad(w.T)
+}
+
+func mixOk(t T) MixedErrFunc {
+	t.Helper()
+	return func(any interface{}, err error) T {
+		t.Helper()
+		if err != nil {
+			t.Error(err)
+		}
+		return t
+	}
+}
+
+func mixBad(t T) MixedErrFunc {
+	t.Helper()
+	return func(any interface{}, err error) T {
+		t.Helper()
+		if err == nil {
+			t.Error("should fail")
+		}
+		return t
+	}
+}
+
+type MixedErrFunc func(interface{}, error) T
+
+// ----------------------------------------
 
 func (w *wrappedT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{w.T, h}
@@ -198,6 +234,11 @@ func (t *noopT) ResponseFrom(h http.Handler) *HttpResponse {
 }
 func (t *noopT) Errors() (ok, bad AssertErrFunc) {
 	return func(error, ...string) {}, func(error, ...string) {}
+}
+
+func (t *noopT) Mixed() (ok, bad MixedErrFunc) {
+	return func(interface{}, error) T { return t },
+		func(interface{}, error) T { return t }
 }
 
 // Assert returns an asserter for online assertions.

@@ -60,6 +60,13 @@ func TestNew(t *testing.T) {
 	ok(nil, "message")
 	bad(nil)
 	bad(nil, "message")
+
+	t.Run("Mixed", func(t *testing.T) {
+		ok, bad := assert().Mixed()
+		ok(nil, nil)
+		bad(1, errors.New("any error"))
+	})
+
 }
 
 type brokenReader string
