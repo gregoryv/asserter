@@ -19,7 +19,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
 type T interface {
@@ -128,33 +127,27 @@ func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
 
 func assertOk(t T) AssertErrFunc {
 	t.Helper()
-	return func(err error, msg ...string) {
+	return func(err error) T {
 		t.Helper()
 		if err != nil {
-			if len(msg) > 0 {
-				t.Error(strings.Join(msg, " ")+":", err)
-				return
-			}
 			t.Error(err)
 		}
+		return t
 	}
 }
 
 func assertBad(t T) AssertErrFunc {
 	t.Helper()
-	return func(err error, msg ...string) {
+	return func(err error) T {
 		t.Helper()
 		if err == nil {
-			if len(msg) > 0 {
-				t.Error(strings.Join(msg, " "), "should fail")
-				return
-			}
 			t.Error("should fail")
 		}
+		return t
 	}
 }
 
-type AssertErrFunc func(error, ...string)
+type AssertErrFunc func(error) T
 
 // ----------------------------------------
 
@@ -233,7 +226,8 @@ func (t *noopT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{t, h}
 }
 func (t *noopT) Errors() (ok, bad AssertErrFunc) {
-	return func(error, ...string) {}, func(error, ...string) {}
+	return func(error) T { return t },
+		func(error) T { return t }
 }
 
 func (t *noopT) Mixed() (ok, bad MixedErrFunc) {

@@ -54,12 +54,12 @@ func TestNew(t *testing.T) {
 
 	ok, bad := assert().Errors()
 	ok(nil)
-	ok(nil, "message")
+	ok(nil).Log("message")
 	ok(errors.New(""))
-	ok(errors.New(""), "message")
-	ok(nil, "message")
+	ok(errors.New("")).Log("message")
+	ok(nil).Log("message")
 	bad(nil)
-	bad(nil, "message")
+	bad(nil).Log("message")
 
 	t.Run("Mixed", func(t *testing.T) {
 		ok, bad := assert().Mixed()
