@@ -68,6 +68,22 @@ func TestNew(t *testing.T) {
 	})
 }
 
+func TestNewErrors(t *testing.T) {
+	var (
+		ok, bad = NewErrors(t)
+	)
+	ok(nil)
+	bad(errors.New(""))
+}
+
+func TestNewMixed(t *testing.T) {
+	var (
+		ok, bad = NewMixed(t)
+	)
+	ok(1, nil)
+	bad("", errors.New(""))
+}
+
 type brokenReader string
 
 func (br brokenReader) Read(buf []byte) (int, error) {

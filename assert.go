@@ -134,6 +134,11 @@ func (w *wrappedT) Contains(body, exp interface{}) T {
 
 // ----------------------------------------
 
+func NewErrors(t T) (ok, bad AssertErrFunc) {
+	t.Helper()
+	return New(t)().Errors()
+}
+
 func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
 	return assertOk(w.T), assertBad(w.T)
@@ -166,6 +171,11 @@ func assertBad(t T) AssertErrFunc {
 type AssertErrFunc func(error) T
 
 // ----------------------------------------
+
+func NewMixed(t T) (ok, bad MixedErrFunc) {
+	t.Helper()
+	return New(t)().Mixed()
+}
 
 func (w *wrappedT) Mixed() (ok, bad MixedErrFunc) {
 	w.T.Helper()
