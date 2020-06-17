@@ -42,6 +42,20 @@ type A interface {
 	Mixed() (ok, bad MixedErrFunc)
 }
 
+// Assert returns an asserter for online assertions.
+func New(t T) AssertFunc {
+	return func(expr ...bool) A {
+		if len(expr) > 1 {
+			t.Helper()
+			t.Fatal("Only 0 or 1 bool expressions are allowed")
+		}
+		if len(expr) == 0 || !expr[0] {
+			return &wrappedT{t}
+		}
+		return &noopT{}
+	}
+}
+
 type AssertFunc func(expr ...bool) A
 
 type wrappedT struct {
@@ -131,8 +145,9 @@ func assertOk(t T) AssertErrFunc {
 		t.Helper()
 		if err != nil {
 			t.Error(err)
+			return t
 		}
-		return t
+		return &noopT{}
 	}
 }
 
@@ -142,8 +157,9 @@ func assertBad(t T) AssertErrFunc {
 		t.Helper()
 		if err == nil {
 			t.Error("should fail")
+			return t
 		}
-		return t
+		return &noopT{}
 	}
 }
 
@@ -162,8 +178,9 @@ func mixOk(t T) MixedErrFunc {
 		t.Helper()
 		if err != nil {
 			t.Error(err)
+			return t
 		}
-		return t
+		return &noopT{}
 	}
 }
 
@@ -173,8 +190,9 @@ func mixBad(t T) MixedErrFunc {
 		t.Helper()
 		if err == nil {
 			t.Error("should fail")
+			return t
 		}
-		return t
+		return &noopT{}
 	}
 }
 
@@ -233,18 +251,4 @@ func (t *noopT) Errors() (ok, bad AssertErrFunc) {
 func (t *noopT) Mixed() (ok, bad MixedErrFunc) {
 	return func(interface{}, error) T { return t },
 		func(interface{}, error) T { return t }
-}
-
-// Assert returns an asserter for online assertions.
-func New(t T) AssertFunc {
-	return func(expr ...bool) A {
-		if len(expr) > 1 {
-			t.Helper()
-			t.Fatal("Only 0 or 1 bool expressions are allowed")
-		}
-		if len(expr) == 0 || !expr[0] {
-			return &wrappedT{t}
-		}
-		return &noopT{}
-	}
 }

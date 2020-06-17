@@ -66,7 +66,6 @@ func TestNew(t *testing.T) {
 		ok(nil, nil)
 		bad(1, errors.New("any error"))
 	})
-
 }
 
 type brokenReader string
