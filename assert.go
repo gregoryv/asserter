@@ -208,6 +208,8 @@ func (w *WrappedT) FatalErrIsNotNil(err error) T {
 
 // ----------------------------------------
 
+type MixedErrFunc func(interface{}, error) T
+
 func NewMixed(t T) (ok, bad MixedErrFunc) {
 	t.Helper()
 	return Wrap(t).Mixed()
@@ -215,34 +217,56 @@ func NewMixed(t T) (ok, bad MixedErrFunc) {
 
 func (w *WrappedT) Mixed() (ok, bad MixedErrFunc) {
 	w.T.Helper()
-	return mixOk(w.T), mixBad(w.T)
+	return w.MixedErrIsNil, w.MixedErrIsNotNil
 }
 
-func mixOk(t T) MixedErrFunc {
-	t.Helper()
-	return func(any interface{}, err error) T {
-		t.Helper()
-		if err != nil {
-			t.Error(err)
-			return t
-		}
-		return &noopT{}
+func (w *WrappedT) MixedErrIsNil(any interface{}, err error) T {
+	w.T.Helper()
+	if err != nil {
+		w.T.Error(err)
+		return w
 	}
+	return &noopT{}
 }
 
-func mixBad(t T) MixedErrFunc {
-	t.Helper()
-	return func(any interface{}, err error) T {
-		t.Helper()
-		if err == nil {
-			t.Error("should fail")
-			return t
-		}
-		return &noopT{}
+func (w *WrappedT) MixedErrIsNotNil(any interface{}, err error) T {
+	w.T.Helper()
+	if err == nil {
+		w.T.Error("should fail")
+		return w
 	}
+	return &noopT{}
 }
 
-type MixedErrFunc func(interface{}, error) T
+// ---------
+
+func NewFatalMixed(t T) (ok, bad MixedErrFunc) {
+	t.Helper()
+	return Wrap(t).FatalMixed()
+}
+
+func (w *WrappedT) FatalMixed() (ok, bad MixedErrFunc) {
+	w.T.Helper()
+	return w.FatalMixedErrIsNil, w.FatalMixedErrIsNotNil
+}
+
+func (w *WrappedT) FatalMixedErrIsNil(any interface{}, err error) T {
+	w.T.Helper()
+	if err != nil {
+		w.T.Fatal(err)
+		return w
+	}
+	return &noopT{}
+}
+
+func (w *WrappedT) FatalMixedErrIsNotNil(any interface{}, err error) T {
+	w.T.Helper()
+	if err == nil {
+		w.T.Fatal("should fail")
+		return w
+	}
+	return &noopT{}
+}
 
 // ----------------------------------------
 
