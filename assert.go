@@ -146,17 +146,17 @@ func (w *WrappedT) Contains(body, exp interface{}) T {
 
 // ----------------------------------------
 
+type AssertErrFunc func(error) T
+
 func NewErrors(t T) (ok, bad AssertErrFunc) {
 	t.Helper()
-	return New(t)().Errors()
+	return Wrap(t).Errors()
 }
 
 func (w *WrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
 	return w.ErrIsNil, w.ErrIsNotNil
 }
-
-type AssertErrFunc func(error) T
 
 func (w *WrappedT) ErrIsNil(err error) T {
 	w.T.Helper()
@@ -176,11 +176,41 @@ func (w *WrappedT) ErrIsNotNil(err error) T {
 	return &noopT{}
 }
 
+// ------------
+
+func NewFatalErrors(t T) (ok, bad AssertErrFunc) {
+	t.Helper()
+	return Wrap(t).FatalErrors()
+}
+
+func (w *WrappedT) FatalErrors() (ok, bad AssertErrFunc) {
+	w.T.Helper()
+	return w.FatalErrIsNil, w.FatalErrIsNotNil
+}
+
+func (w *WrappedT) FatalErrIsNil(err error) T {
+	w.T.Helper()
+	if err != nil {
+		w.T.Fatal(err)
+		return w
+	}
+	return &noopT{}
+}
+
+func (w *WrappedT) FatalErrIsNotNil(err error) T {
+	w.T.Helper()
+	if err == nil {
+		w.T.Fatal(err)
+		return w
+	}
+	return &noopT{}
+}
+
 // ----------------------------------------
 
 func NewMixed(t T) (ok, bad MixedErrFunc) {
 	t.Helper()
-	return New(t)().Mixed()
+	return Wrap(t).Mixed()
 }
 
 func (w *WrappedT) Mixed() (ok, bad MixedErrFunc) {

@@ -68,6 +68,12 @@ func TestNewErrors(t *testing.T) {
 	bad(errors.New(""))
 }
 
+func TestNewFatalErrors(t *testing.T) {
+	ok, bad := NewFatalErrors(&noopT{})
+	ok(errors.New("f"))
+	bad(nil)
+}
+
 func TestNewMixed(t *testing.T) {
 	ok, bad := NewMixed(t)
 	ok(1, nil)
