@@ -34,7 +34,6 @@ type T interface {
 }
 
 type Asserter interface {
-	T
 	Equals(got, exp interface{}) T
 	Contains(body, exp interface{}) T
 	ResponseFrom(http.Handler) *HttpResponse
@@ -42,9 +41,15 @@ type Asserter interface {
 	Mixed() (ok, bad MixedErrFunc)
 }
 
+// Testar combines testing.T with and Asserter
+type Testar interface {
+	T
+	Asserter
+}
+
 // Assert returns an asserter for online assertions.
 func New(t T) AssertFunc {
-	return func(expr ...bool) Asserter {
+	return func(expr ...bool) Testar {
 		if len(expr) > 1 {
 			t.Helper()
 			t.Fatal("Only 0 or 1 bool expressions are allowed")
@@ -56,7 +61,7 @@ func New(t T) AssertFunc {
 	}
 }
 
-type AssertFunc func(expr ...bool) Asserter
+type AssertFunc func(expr ...bool) Testar
 
 type WrappedT struct {
 	T
