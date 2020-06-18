@@ -60,26 +60,16 @@ func TestNew(t *testing.T) {
 	ok(nil).Log("message")
 	bad(nil)
 	bad(nil).Log("message")
-
-	t.Run("Mixed", func(t *testing.T) {
-		ok, bad := assert().Mixed()
-		ok(nil, nil)
-		bad(1, errors.New("any error"))
-	})
 }
 
 func TestNewErrors(t *testing.T) {
-	var (
-		ok, bad = NewErrors(t)
-	)
+	ok, bad := NewErrors(t)
 	ok(nil)
 	bad(errors.New(""))
 }
 
 func TestNewMixed(t *testing.T) {
-	var (
-		ok, bad = NewMixed(t)
-	)
+	ok, bad := NewMixed(t)
 	ok(1, nil)
 	bad("", errors.New(""))
 }
