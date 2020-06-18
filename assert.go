@@ -34,6 +34,7 @@ type T interface {
 }
 
 type Asserter interface {
+	Assert(...bool) T
 	Equals(got, exp interface{}) T
 	Contains(body, exp interface{}) T
 	ResponseFrom(http.Handler) *HttpResponse
@@ -45,6 +46,10 @@ type Asserter interface {
 type Testar interface {
 	T
 	Asserter
+}
+
+func Wrap(t T) *WrappedT {
+	return &WrappedT{t}
 }
 
 // Assert returns an asserter for online assertions.
@@ -65,6 +70,17 @@ type AssertFunc func(expr ...bool) Testar
 
 type WrappedT struct {
 	T
+}
+
+func (w *WrappedT) Assert(expr ...bool) T {
+	if len(expr) > 1 {
+		w.T.Helper()
+		w.T.Fatal("Only 0 or 1 bool expressions are allowed")
+	}
+	if len(expr) == 0 || !expr[0] {
+		return w
+	}
+	return &noopT{}
 }
 
 func (w *WrappedT) Helper() {
@@ -244,6 +260,7 @@ func bytesOrError(r io.Reader) []byte {
 
 type noopT struct{}
 
+func (t *noopT) Assert(...bool) T                 { return t }
 func (t *noopT) Helper()                          {}
 func (t *noopT) Error(...interface{})             {}
 func (t *noopT) Errorf(string, ...interface{})    {}
