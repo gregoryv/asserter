@@ -155,10 +155,10 @@ func NewErrors(t T) (ok, bad AssertErrFunc) {
 
 func (w *WrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
-	return w.ErrIsNil, w.ErrIsNotNil
+	return w.Ok, w.Bad
 }
 
-func (w *WrappedT) ErrIsNil(err error) T {
+func (w *WrappedT) Ok(err error) T {
 	w.T.Helper()
 	if err != nil {
 		w.T.Error(err)
@@ -167,7 +167,7 @@ func (w *WrappedT) ErrIsNil(err error) T {
 	return &noopT{}
 }
 
-func (w *WrappedT) ErrIsNotNil(err error) T {
+func (w *WrappedT) Bad(err error) T {
 	w.T.Helper()
 	if err == nil {
 		w.T.Error(err)
@@ -185,10 +185,10 @@ func NewFatalErrors(t T) (ok, bad AssertErrFunc) {
 
 func (w *WrappedT) FatalErrors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
-	return w.FatalErrIsNil, w.FatalErrIsNotNil
+	return w.MustOk, w.MustBad
 }
 
-func (w *WrappedT) FatalErrIsNil(err error) T {
+func (w *WrappedT) MustOk(err error) T {
 	w.T.Helper()
 	if err != nil {
 		w.T.Fatal(err)
@@ -197,7 +197,7 @@ func (w *WrappedT) FatalErrIsNil(err error) T {
 	return &noopT{}
 }
 
-func (w *WrappedT) FatalErrIsNotNil(err error) T {
+func (w *WrappedT) MustBad(err error) T {
 	w.T.Helper()
 	if err == nil {
 		w.T.Fatal(err)
@@ -217,10 +217,10 @@ func NewMixed(t T) (ok, bad MixedErrFunc) {
 
 func (w *WrappedT) Mixed() (ok, bad MixedErrFunc) {
 	w.T.Helper()
-	return w.MixedErrIsNil, w.MixedErrIsNotNil
+	return w.MixOk, w.MixBad
 }
 
-func (w *WrappedT) MixedErrIsNil(any interface{}, err error) T {
+func (w *WrappedT) MixOk(any interface{}, err error) T {
 	w.T.Helper()
 	if err != nil {
 		w.T.Error(err)
@@ -229,7 +229,7 @@ func (w *WrappedT) MixedErrIsNil(any interface{}, err error) T {
 	return &noopT{}
 }
 
-func (w *WrappedT) MixedErrIsNotNil(any interface{}, err error) T {
+func (w *WrappedT) MixBad(any interface{}, err error) T {
 	w.T.Helper()
 	if err == nil {
 		w.T.Error("should fail")
@@ -247,10 +247,10 @@ func NewFatalMixed(t T) (ok, bad MixedErrFunc) {
 
 func (w *WrappedT) FatalMixed() (ok, bad MixedErrFunc) {
 	w.T.Helper()
-	return w.FatalMixedErrIsNil, w.FatalMixedErrIsNotNil
+	return w.MustMixOk, w.MustMixBad
 }
 
-func (w *WrappedT) FatalMixedErrIsNil(any interface{}, err error) T {
+func (w *WrappedT) MustMixOk(any interface{}, err error) T {
 	w.T.Helper()
 	if err != nil {
 		w.T.Fatal(err)
@@ -259,7 +259,7 @@ func (w *WrappedT) FatalMixedErrIsNil(any interface{}, err error) T {
 	return &noopT{}
 }
 
-func (w *WrappedT) FatalMixedErrIsNotNil(any interface{}, err error) T {
+func (w *WrappedT) MustMixBad(any interface{}, err error) T {
 	w.T.Helper()
 	if err == nil {
 		w.T.Fatal("should fail")
