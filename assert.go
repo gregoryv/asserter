@@ -153,34 +153,28 @@ func NewErrors(t T) (ok, bad AssertErrFunc) {
 
 func (w *WrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
-	return assertOk(w.T), assertBad(w.T)
-}
-
-func assertOk(t T) AssertErrFunc {
-	t.Helper()
-	return func(err error) T {
-		t.Helper()
-		if err != nil {
-			t.Error(err)
-			return t
-		}
-		return &noopT{}
-	}
-}
-
-func assertBad(t T) AssertErrFunc {
-	t.Helper()
-	return func(err error) T {
-		t.Helper()
-		if err == nil {
-			t.Error("should fail")
-			return t
-		}
-		return &noopT{}
-	}
+	return w.ErrIsNil, w.ErrIsNotNil
 }
 
 type AssertErrFunc func(error) T
+
+func (w *WrappedT) ErrIsNil(err error) T {
+	w.T.Helper()
+	if err != nil {
+		w.T.Error(err)
+		return w
+	}
+	return &noopT{}
+}
+
+func (w *WrappedT) ErrIsNotNil(err error) T {
+	w.T.Helper()
+	if err == nil {
+		w.T.Error(err)
+		return w
+	}
+	return &noopT{}
+}
 
 // ----------------------------------------
 
