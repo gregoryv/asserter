@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [unreleased]
 ### Changed
 
+- New Testar interface combines T and Asserter
+- Renamed A interface to Asserter
+- Expose WrappedT struct using Wrap constructor
 - AssertErrFunc signature returns T and doesn't take a message
 
 ## [0.3.0] - 2020-06-16
