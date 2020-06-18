@@ -50,7 +50,7 @@ func New(t T) AssertFunc {
 			t.Fatal("Only 0 or 1 bool expressions are allowed")
 		}
 		if len(expr) == 0 || !expr[0] {
-			return &wrappedT{t}
+			return &WrappedT{t}
 		}
 		return &noopT{}
 	}
@@ -58,56 +58,56 @@ func New(t T) AssertFunc {
 
 type AssertFunc func(expr ...bool) A
 
-type wrappedT struct {
+type WrappedT struct {
 	T
 }
 
-func (w *wrappedT) Helper() {
+func (w *WrappedT) Helper() {
 	/* Cannot use the asserter as helper */
 }
 
-func (w *wrappedT) Error(args ...interface{}) {
+func (w *WrappedT) Error(args ...interface{}) {
 	w.T.Helper()
 	w.T.Error(args...)
 }
 
-func (w *wrappedT) Errorf(format string, args ...interface{}) {
+func (w *WrappedT) Errorf(format string, args ...interface{}) {
 	w.T.Helper()
 	w.T.Errorf(format, args...)
 }
 
-func (w *wrappedT) Fatal(args ...interface{}) {
+func (w *WrappedT) Fatal(args ...interface{}) {
 	w.T.Helper()
 	w.T.Fatal(args...)
 }
 
-func (w *wrappedT) Fatalf(format string, args ...interface{}) {
+func (w *WrappedT) Fatalf(format string, args ...interface{}) {
 	w.T.Helper()
 	w.T.Fatalf(format, args...)
 }
 
-func (w *wrappedT) Fail() {
+func (w *WrappedT) Fail() {
 	w.T.Helper()
 	w.T.Fail()
 }
 
-func (w *wrappedT) FailNow() {
+func (w *WrappedT) FailNow() {
 	w.T.Helper()
 	w.T.FailNow()
 }
-func (w *wrappedT) Log(args ...interface{}) {
+func (w *WrappedT) Log(args ...interface{}) {
 	w.T.Helper()
 	w.T.Log(args...)
 }
 
-func (w *wrappedT) Logf(format string, args ...interface{}) {
+func (w *WrappedT) Logf(format string, args ...interface{}) {
 	w.T.Helper()
 	w.T.Logf(format, args...)
 }
 
 // Helpers
 
-func (w *wrappedT) Equals(got, exp interface{}) T {
+func (w *WrappedT) Equals(got, exp interface{}) T {
 	w.T.Helper()
 	if got != exp {
 		w.Errorf("got %v, expected %v", got, exp)
@@ -117,7 +117,7 @@ func (w *wrappedT) Equals(got, exp interface{}) T {
 
 // Contains checks the body for the given expression.
 // The body can be various types.
-func (w *wrappedT) Contains(body, exp interface{}) T {
+func (w *WrappedT) Contains(body, exp interface{}) T {
 	w.T.Helper()
 	b := toBytes(w.T, body, "body")
 	e := toBytes(w.T, exp, "exp")
@@ -139,7 +139,7 @@ func NewErrors(t T) (ok, bad AssertErrFunc) {
 	return New(t)().Errors()
 }
 
-func (w *wrappedT) Errors() (ok, bad AssertErrFunc) {
+func (w *WrappedT) Errors() (ok, bad AssertErrFunc) {
 	w.T.Helper()
 	return assertOk(w.T), assertBad(w.T)
 }
@@ -177,7 +177,7 @@ func NewMixed(t T) (ok, bad MixedErrFunc) {
 	return New(t)().Mixed()
 }
 
-func (w *wrappedT) Mixed() (ok, bad MixedErrFunc) {
+func (w *WrappedT) Mixed() (ok, bad MixedErrFunc) {
 	w.T.Helper()
 	return mixOk(w.T), mixBad(w.T)
 }
@@ -210,7 +210,7 @@ type MixedErrFunc func(interface{}, error) T
 
 // ----------------------------------------
 
-func (w *wrappedT) ResponseFrom(h http.Handler) *HttpResponse {
+func (w *WrappedT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{w.T, h}
 }
 
