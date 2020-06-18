@@ -33,7 +33,7 @@ type T interface {
 	Logf(string, ...interface{})
 }
 
-type A interface {
+type Asserter interface {
 	T
 	Equals(got, exp interface{}) T
 	Contains(body, exp interface{}) T
@@ -44,7 +44,7 @@ type A interface {
 
 // Assert returns an asserter for online assertions.
 func New(t T) AssertFunc {
-	return func(expr ...bool) A {
+	return func(expr ...bool) Asserter {
 		if len(expr) > 1 {
 			t.Helper()
 			t.Fatal("Only 0 or 1 bool expressions are allowed")
@@ -56,7 +56,7 @@ func New(t T) AssertFunc {
 	}
 }
 
-type AssertFunc func(expr ...bool) A
+type AssertFunc func(expr ...bool) Asserter
 
 type WrappedT struct {
 	T
