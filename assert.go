@@ -170,7 +170,7 @@ func (w *WrappedT) Ok(err error) T {
 func (w *WrappedT) Bad(err error) T {
 	w.T.Helper()
 	if err == nil {
-		w.T.Error(err)
+		w.T.Error("expected error")
 		return w
 	}
 	return &noopT{}
@@ -200,7 +200,7 @@ func (w *WrappedT) MustOk(err error) T {
 func (w *WrappedT) MustBad(err error) T {
 	w.T.Helper()
 	if err == nil {
-		w.T.Fatal(err)
+		w.T.Fatal("expected error")
 		return w
 	}
 	return &noopT{}
@@ -232,7 +232,7 @@ func (w *WrappedT) MixOk(any interface{}, err error) T {
 func (w *WrappedT) MixBad(any interface{}, err error) T {
 	w.T.Helper()
 	if err == nil {
-		w.T.Error("should fail")
+		w.T.Error("expected error")
 		return w
 	}
 	return &noopT{}
