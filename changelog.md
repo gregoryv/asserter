@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [unreleased]
 ### Changed
 
+- Equals uses reflect.DeepEqual
 - New Testar interface combines T and Asserter
 - Renamed A interface to Asserter
 - Expose WrappedT struct using Wrap constructor

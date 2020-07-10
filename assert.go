@@ -18,6 +18,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strconv"
 )
 
@@ -121,7 +122,7 @@ func (w *WrappedT) Logf(format string, args ...interface{}) {
 
 func (w *WrappedT) Equals(got, exp interface{}) T {
 	w.T.Helper()
-	if got != exp {
+	if !reflect.DeepEqual(got, exp) {
 		w.Errorf("got %v, expected %v", got, exp)
 	}
 	return w.T
