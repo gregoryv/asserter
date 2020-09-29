@@ -24,9 +24,14 @@ func ExampleNew() {
 func ExampleHttpResponse_StatusCode() {
 	assert := asserter.New(t)
 	exp := assert().ResponseFrom(handler)
+	// io.Reader option means body
 	exp.StatusCode(200, "POST", "/", strings.NewReader("the body"))
+	// string option means error message
 	exp.StatusCode(200, "GET", "/", "should be ok")
-	exp.StatusCode(200, "GET", "/")
+	// http.Header additional headers
+	exp.StatusCode(200, "GET", "/", http.Header{
+		"Content-Type": []string{"text/plain"},
+	})
 }
 
 func Test_something(t *testing.T) {
