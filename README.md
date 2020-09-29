@@ -27,3 +27,17 @@ In your tests
 	    assert(err == nil).Fatal(err)
 	    assert().Contains(resp.Body, "<title>")
     }
+
+
+HTTP handler specific
+
+    assert := asserter.New(t)
+    exp := assert().ResponseFrom(handler)
+    // io.Reader option means body
+    exp.StatusCode(200, "POST", "/", strings.NewReader("the body"))
+    // string option means error message
+    exp.StatusCode(200, "GET", "/", "should be ok")
+    // http.Header additional headers
+    exp.StatusCode(200, "GET", "/", http.Header{
+        "Content-Type": []string{"text/plain"},
+    })
