@@ -26,25 +26,28 @@ func ExampleHttpResponse_StatusCode() {
 	exp := assert().ResponseFrom(handler)
 	// io.Reader option means body
 	exp.StatusCode(200, "POST", "/", strings.NewReader("the body"))
+
 	// string option means error message
 	exp.StatusCode(200, "GET", "/", "should be ok")
+
 	// http.Header additional headers
 	exp.StatusCode(200, "GET", "/", http.Header{
 		"Content-Type": []string{"text/plain"},
 	})
 }
 
-func Test_something(t *testing.T) {
-	assert := asserter.New(t)
-	got, err := something()
-	assert(err == nil).Fatal(err)
-	exp := 1
-	assert().Equals(got, exp)
-	// Same as
-	assert(got == exp).Errorf("got %v, expected %v", got, exp)
+func ExampleWrap() {
+	w := asserter.Wrap(t)
+	w.MixOk(something())
 
-	resp, err := http.Get("http://example.com")
-	assert().Contains(resp.Body, "</html>")
+	got := 2
+	exp := 1
+	w.Assert().Equals(got, exp)
+	// Same as
+	w.Assert(got == exp).Errorf("got %v, expected %v", got, exp)
+
+	resp, _ := http.Get("http://example.com")
+	w.Assert().Contains(resp.Body, "</html>")
 }
 
 func something() (int, error) {
