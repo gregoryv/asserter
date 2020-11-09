@@ -7,6 +7,9 @@ import (
 	"net/http"
 	"reflect"
 	"strconv"
+	"strings"
+
+	"github.com/pmezard/go-difflib/difflib"
 )
 
 type T interface {
@@ -110,9 +113,28 @@ func (w *WrappedT) Logf(format string, args ...interface{}) {
 func (w *WrappedT) Equals(got, exp interface{}) T {
 	w.T.Helper()
 	if !reflect.DeepEqual(got, exp) {
-		w.Errorf("got %v, expected %v", got, exp)
+		got := string(toBytes(w.T, got, "got"))
+		exp := string(toBytes(w.T, exp, "exp"))
+
+		if strings.Contains(got, "\n") || strings.Contains(exp, "\n") {
+			w.Errorf("\n%s", diff(string(got), string(exp)))
+			return w.T
+		}
+		w.Errorf("\ngot: %v\nexp: %v", got, exp)
 	}
 	return w.T
+}
+
+func diff(got, exp string) string {
+	d := difflib.UnifiedDiff{
+		A:        difflib.SplitLines(got),
+		B:        difflib.SplitLines(exp),
+		FromFile: "Exp",
+		ToFile:   "Got",
+		Context:  3,
+	}
+	text, _ := difflib.GetUnifiedDiffString(d)
+	return text
 }
 
 // Contains checks the body for the given expression.

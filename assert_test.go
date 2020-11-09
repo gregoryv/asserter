@@ -11,6 +11,12 @@ func xTest_real(t *testing.T) {
 	ok, bad := assert().Errors()
 	ok(errors.New(""))
 	bad(nil)
+
+	assert().Equals("hello my\nfriend", "hello my\nenemy")
+	assert().Equals(
+		"GCATGCU",
+		"GATTACA",
+	)
 }
 
 func TestNew(t *testing.T) {
