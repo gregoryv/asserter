@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Add NotEqual
 - Equals shows diff for values containing line breaks
 
 ## [0.4.0] - 2020-07-22

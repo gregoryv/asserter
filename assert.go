@@ -27,6 +27,7 @@ type T interface {
 type Asserter interface {
 	Assert(...bool) Testar
 	Equals(got, exp interface{}) T
+	NotEqual(a, b interface{}) T
 	Contains(body, exp interface{}) T
 	ResponseFrom(http.Handler) *HttpResponse
 	Errors() (ok, bad AssertErrFunc)
@@ -110,6 +111,8 @@ func (w *WrappedT) Logf(format string, args ...interface{}) {
 
 // Helpers
 
+// Equals fails with error if got is different from exp.
+// Returns T for e.g. logging extra or calling Fatal if needed.
 func (w *WrappedT) Equals(got, exp interface{}) T {
 	w.T.Helper()
 	if !reflect.DeepEqual(got, exp) {
@@ -123,6 +126,19 @@ func (w *WrappedT) Equals(got, exp interface{}) T {
 		w.Errorf("\ngot: %v\nexp: %v", got, exp)
 	}
 	return w.T
+}
+
+func (w *WrappedT) NotEqual(a, b interface{}) T {
+	w.T.Helper()
+
+	A := string(toBytes(w.T, a, "a"))
+	B := string(toBytes(w.T, b, "b"))
+
+	if A == B {
+		w.Error("a and b are equal")
+		return w.T
+	}
+	return &noopT{}
 }
 
 func diff(got, exp string) string {
@@ -320,6 +336,7 @@ func (t *noopT) FailNow()                         {}
 func (t *noopT) Log(...interface{})               {}
 func (t *noopT) Logf(string, ...interface{})      {}
 func (t *noopT) Equals(got, exp interface{}) T    { return t }
+func (t *noopT) NotEqual(a, b interface{}) T      { return t }
 func (t *noopT) Contains(body, exp interface{}) T { return t }
 func (t *noopT) ResponseFrom(h http.Handler) *HttpResponse {
 	return &HttpResponse{t, h}

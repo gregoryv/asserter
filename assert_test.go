@@ -6,17 +6,9 @@ import (
 	"testing"
 )
 
-func xTest_real(t *testing.T) {
-	assert := New(t)
-	ok, bad := assert().Errors()
-	ok(errors.New(""))
-	bad(nil)
-
-	assert().Equals("hello my\nfriend", "hello my\nenemy")
-	assert().Equals(
-		"GCATGCU",
-		"GATTACA",
-	)
+func Test_real(t *testing.T) {
+	a := Wrap(t)
+	a.NotEqual("hello my\nfriend", "hello my\nenemy")
 }
 
 func TestNew(t *testing.T) {
@@ -44,7 +36,8 @@ func TestNew(t *testing.T) {
 	assert(false).FailNow()
 	assert(false).Log()
 	assert(false).Logf("%s", "yes")
-	assert(false).Equals(true, false)
+	assert().Equals(true, false)
+	assert().NotEqual(true, true)
 	assert(false).Equals(true, false).Log("case 1")
 	assert(false).Contains("hello", "h")
 	assert(false).Contains([]byte("hello"), "h")
