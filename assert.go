@@ -143,8 +143,8 @@ func (w *WrappedT) NotEqual(a, b interface{}) T {
 
 func diff(got, exp string) string {
 	d := difflib.UnifiedDiff{
-		A:        difflib.SplitLines(got),
-		B:        difflib.SplitLines(exp),
+		A:        difflib.SplitLines(exp),
+		B:        difflib.SplitLines(got),
 		FromFile: "Exp",
 		ToFile:   "Got",
 		Context:  3,
