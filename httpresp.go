@@ -25,12 +25,12 @@ func (t *HttpResponse) StatusCode(exp int, m, p string, opt ...interface{}) {
 		return
 	}
 	if message == "" {
-		message = "StatusCode"
+		message = fmt.Sprintf("%s %s %v", m, p, resp.StatusCode)
 	}
 	if resp.StatusCode != exp {
 		t.Fatalf(
-			"%s: %s, expected %v %s",
-			message, resp.Status, exp, http.StatusText(exp),
+			"%s expected %v %s",
+			message, exp, http.StatusText(exp),
 		)
 	}
 }
@@ -49,7 +49,7 @@ func (t *HttpResponse) BodyEquals(exp []byte, m, p string, opt ...interface{}) {
 		return
 	}
 	if message == "" {
-		message = "Body"
+		message = fmt.Sprintf("%s %s %v", m, p, resp.StatusCode)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -69,7 +69,7 @@ func (t *HttpResponse) Contains(exp string, m, p string, opt ...interface{}) {
 		return
 	}
 	if message == "" {
-		message = "Contains"
+		message = fmt.Sprintf("%s %s %v", m, p, resp.StatusCode)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
@@ -86,13 +86,13 @@ func (t *HttpResponse) Header(k, exp string, m, p string, opt ...interface{}) {
 	body, headers, message := t.parse(opt...)
 	resp := t.do(m, p, body, headers)
 	if message == "" {
-		message = k
+		message = fmt.Sprintf("%s %s %v", m, p, resp.StatusCode)
 	} else {
-		message = fmt.Sprintf("%s %s", k, message)
+		message = fmt.Sprintf("%s %s %v %s", m, p, resp.StatusCode, message)
 	}
 	got := resp.Header.Get(k)
 	if got != exp {
-		t.Fatalf("%s: %q expected %q", message, got, exp)
+		t.Fatalf("%s\n%s: %q expected %q", message, k, got, exp)
 	}
 }
 
