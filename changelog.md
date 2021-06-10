@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [unreleased]
 
+- Update dependencies
 - Add method and path to HttpResponse asserters
 - Add NotEqual
 - Equals shows diff for values containing line breaks

@@ -3,8 +3,7 @@ module github.com/gregoryv/asserter
 go 1.12
 
 require (
-	github.com/gregoryv/find v0.0.0-20180328085109-1bbc2d70c482 // indirect
-	github.com/gregoryv/gocyclo v0.0.0-20180305144948-0be7902fabdc // indirect
-	github.com/gregoryv/qual v0.2.1
+	github.com/gregoryv/gocyclo v0.1.0 // indirect
+	github.com/gregoryv/qual v0.4.0
 	github.com/pmezard/go-difflib v1.0.0
 )
