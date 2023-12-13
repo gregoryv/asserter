@@ -4,6 +4,13 @@
 
 [asserter](https://godoc.org/github.com/gregoryv/asserter) - Package for oneline assertions
 
+NO LONGER MAINTAINED!!!
+
+After some consideration and
+reading
+[Assert Libraries](https://github.com/golang/go/wiki/TestComments#assert-libraries) I've
+decided to stop using this package and advise you the same.
+
 ## Quick start
 
     go get github.com/gregoryv/asserter
