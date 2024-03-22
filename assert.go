@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/pmezard/go-difflib/difflib"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 type T interface {
@@ -142,15 +142,9 @@ func (w *WrappedT) NotEqual(a, b interface{}) T {
 }
 
 func diff(got, exp string) string {
-	d := difflib.UnifiedDiff{
-		A:        difflib.SplitLines(exp),
-		B:        difflib.SplitLines(got),
-		FromFile: "Exp",
-		ToFile:   "Got",
-		Context:  3,
-	}
-	text, _ := difflib.GetUnifiedDiffString(d)
-	return text
+	dmp := diffmatchpatch.New()
+	diffs := dmp.DiffMain(exp, got, false)
+	return dmp.DiffPrettyText(diffs)
 }
 
 // Contains checks the body for the given expression.

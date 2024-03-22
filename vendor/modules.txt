@@ -1,6 +1,10 @@
-# github.com/gregoryv/find v0.0.0-20180328085109-1bbc2d70c482
-github.com/gregoryv/find
-# github.com/gregoryv/gocyclo v0.0.0-20180305144948-0be7902fabdc
+# github.com/gregoryv/gocyclo v0.1.1
+## explicit; go 1.12
 github.com/gregoryv/gocyclo
-# github.com/gregoryv/qual v0.2.1
+# github.com/gregoryv/qual v0.4.3
+## explicit; go 1.12
 github.com/gregoryv/qual
+github.com/gregoryv/qual/internal/find
+# github.com/sergi/go-diff v1.3.1
+## explicit; go 1.12
+github.com/sergi/go-diff/diffmatchpatch

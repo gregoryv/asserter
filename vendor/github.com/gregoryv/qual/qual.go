@@ -3,20 +3,16 @@ package qual
 import (
 	"bufio"
 	"container/list"
-	"github.com/gregoryv/find"
-	"github.com/gregoryv/gocyclo"
+	"fmt"
 	"math"
 	"os"
 	"strings"
 	"time"
-)
 
-type T interface {
-	Helper()
-	Error(...interface{})
-	Errorf(string, ...interface{})
-	Log(...interface{})
-}
+	"github.com/gregoryv/qual/internal/find"
+
+	"github.com/gregoryv/gocyclo"
+)
 
 // High is the same as Standard, only it includes all vendor
 // source as well.
@@ -39,11 +35,16 @@ func standard(includeVendor bool, t T) {
 	LineLength(80, 4, includeVendor, t)
 }
 
-// SourceWidth fails if any go file contains lines exceeding maxChars.
+// LineLength fails if any go file contains lines exceeding maxChars.
 // All lines are considered, source and comments.
 func LineLength(maxChars, tabSize int, includeVendor bool, t T) {
 	t.Helper()
 	files := findGoFiles(includeVendor)
+	long := &lineChecker{
+		lines:    make([]string, 0),
+		maxChars: maxChars,
+		tab:      strings.Repeat(" ", tabSize),
+	}
 	for _, file := range files {
 		fh, err := os.Open(file)
 		if err != nil {
@@ -54,15 +55,33 @@ func LineLength(maxChars, tabSize int, includeVendor bool, t T) {
 		for scanner.Scan() {
 			no++
 			line := scanner.Text()
-			tabSize := 4
-			tab := strings.Repeat(" ", tabSize)
-			line = strings.Replace(line, "\t", tab, -1) // tabs are 4 chars wide
-			if len(line) > maxChars {
-				t.Errorf("Shorten %s:%v from %v to %v chars", file, no,
-					len(line), maxChars)
-			}
+			long.check(file, line, no)
 		}
+	}
+	long.failIfFound(t)
+}
 
+type lineChecker struct {
+	lines    []string
+	maxChars int
+	tab      string
+}
+
+func (long *lineChecker) check(file, line string, no int) {
+	line = strings.Replace(line, "\t", long.tab, -1) // tabs are 4 chars wide
+	if len(line) <= long.maxChars {
+		return
+	}
+	format := "%s:%v trim %v chars"
+	long.lines = append(long.lines, fmt.Sprintf(format, file, no,
+		len(line)-long.maxChars))
+}
+
+func (long *lineChecker) failIfFound(t T) {
+	t.Helper()
+	if len(long.lines) > 0 {
+		format := "Following lines exceed the specified length %v\n%s"
+		t.Errorf(format, long.maxChars, strings.Join(long.lines, "\n"))
 	}
 }
 
@@ -84,7 +103,7 @@ func CyclomaticComplexity(max int, includeVendor bool, t T) {
 		}
 		total -= len(result) * max
 		t.Errorf("Total complexity overload %v expected to be done %v",
-			total, time.Now().Add(totalFixDur).Format(time.RFC3339))
+			total, totalFixDur)
 	}
 }
 
@@ -92,7 +111,6 @@ func CyclomaticComplexity(max int, includeVendor bool, t T) {
 DefaultWeight is the duration it takes to fix overloaded complexity level.
 E.g. if complexity is 6 and you've set max to 5 this is the duration it
 takes to fix the code from 6 to 5.
-
 */
 var DefaultWeight = 20 * 60 * time.Second
 
@@ -111,7 +129,7 @@ func findGoFiles(includeVendor bool) (result []string) {
 	if includeVendor {
 		return toSlice(found)
 	}
-	return exclude("vendor/", found)
+	return exclude("vendor"+string(os.PathSeparator), found)
 }
 
 func exclude(pattern string, files *list.List) (result []string) {

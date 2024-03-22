@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 path=$1
 dir=$(dirname "$path")
@@ -8,8 +8,9 @@ nameonly="${filename%.*}"
 
 case $extension in
     go)
+	goimports -w $path
         gofmt -w $path
         ;;
 esac
-go test -coverprofile /tmp/c.out .
+go test -coverprofile /tmp/c.out ./...
 uncover /tmp/c.out
